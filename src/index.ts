@@ -1,17 +1,38 @@
 /** @format */
-import express, { Request, Response } from "express";
 
-const app = express();
+import { AppDataSource } from "./data-source";
+import * as express from "express";
+import userRouter from "./controllers/user.controller";
+import bodyParser = require("body-parser");
 
-const PORT = process.env.PORT || 3000;
+AppDataSource.initialize()
+	.then(async () => {
+		// console.log("Inserting a new user into the database...");
+		// const user = new User();
+		// user.email = "1st@maildrop.cc";
+		// user.name = "Sawlly";a
 
-app.use(express.json());
+		// await AppDataSource.manager.save(user);
+		// console.log("Saved a new user with id: " + user.id);
 
-app.get("/", (req: Request, res: Response) => {
-	const name = req.query.name;
-	res.status(200).send(`Hello ${name || "World"}`);
-});
+		// console.log("Loading users from the database...");
+		// const users = await AppDataSource.manager.find(User);
+		// console.log("Loaded users: ", users);
 
-app.listen(3000, () => {
-	console.log(`Server is running on port ${PORT}`);
-});
+		const app = express();
+		app.use(express.json());
+		app.use(express.urlencoded({ extended: true }));
+		app.use(bodyParser.json());
+		app.use("/user", userRouter);
+
+		app.get("/", (req, res) => {
+			res.send("Your application is running");
+		});
+
+		app.listen(3000);
+
+		console.log(
+			"Here you can setup and run express / fastify / any other framework."
+		);
+	})
+	.catch((error) => console.log(error));
